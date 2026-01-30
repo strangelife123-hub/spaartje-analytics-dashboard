@@ -98,6 +98,7 @@ export default function Dashboard() {
   const [onboardingRate, setOnboardingRate] = useState(0);
   const [todayStats, setTodayStats] = useState({ users: 0, events: 0, sessions: 0, messages: 0 });
   const [totalUsers, setTotalUsers] = useState(0);
+  const [newUsers, setNewUsers] = useState(0);
   const [avgProcessingMs, setAvgProcessingMs] = useState(0);
   const [totalSavings, setTotalSavings] = useState(0);
   const [basketsGenerated, setBasketsGenerated] = useState(0);
@@ -130,21 +131,15 @@ export default function Dashboard() {
         .gte('received_at', dateFilter)
         .order('received_at', { ascending: false });
 
-      console.log('Events fetch:', { count: events?.length, error: eventsError });
-
       const { data: sessions, error: sessionsError } = await supabase
         .from('chat_sessions')
         .select('created_at, user_id, state')
         .gte('created_at', dateFilter);
 
-      console.log('Sessions fetch:', { count: sessions?.length, error: sessionsError });
-
       const { data: messages, error: messagesError } = await supabase
         .from('chat_messages')
         .select('created_at, role, response_type, processing_ms, scenario')
         .gte('created_at', dateFilter);
-
-      console.log('Messages fetch:', { count: messages?.length, error: messagesError });
 
       // Fetch live store data instead of stale daily_observability snapshot
       const { data: stores } = await supabase
@@ -162,6 +157,26 @@ export default function Dashboard() {
       const { data: productCounts } = await supabase
         .from('store_offerings')
         .select('store_id');
+
+      // Get all users' first event dates to calculate new users
+      const { data: allEvents } = await supabase
+        .from('analytics_events')
+        .select('firebase_uid, received_at')
+        .order('received_at', { ascending: true });
+
+      // Find first event date for each user
+      const userFirstEvent = new Map<string, string>();
+      allEvents?.forEach((e) => {
+        if (!userFirstEvent.has(e.firebase_uid)) {
+          userFirstEvent.set(e.firebase_uid, e.received_at);
+        }
+      });
+
+      // Count users whose first event is within the selected time range
+      const newUsersCount = Array.from(userFirstEvent.values()).filter(
+        (firstEvent) => firstEvent >= dateFilter
+      ).length;
+      setNewUsers(newUsersCount);
 
       const allUsers = new Set(events?.map((e) => e.firebase_uid) || []);
       setTotalUsers(allUsers.size);
@@ -406,7 +421,7 @@ export default function Dashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-2 sm:mb-4">
           <StatCard label="Today's Users" value={todayStats.users} color="text-blue-700" />
           <StatCard label="Today's Events" value={todayStats.events} color="text-emerald-700" />
-          <StatCard label="Total Users" value={totalUsers} color="text-violet-700" />
+          <StatCard label="New Users" value={newUsers} color="text-violet-700" />
           <StatCard label="Onboarding" value={`${onboardingRate}%`} color="text-amber-700" />
         </div>
 
