@@ -421,7 +421,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
                   <XAxis dataKey="date" stroke="#374151" fontSize={11} fontWeight={500} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} />
                   <YAxis stroke="#374151" fontSize={11} fontWeight={500} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} tickFormatter={(v) => v.toLocaleString()} />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value: number) => [value.toLocaleString(), 'Users']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value) => [Number(value).toLocaleString(), 'Users']} />
                   <Area type="monotone" dataKey="unique_users" stroke="#2563EB" fill="#2563EB" fillOpacity={0.15} strokeWidth={2} name="Users" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -435,7 +435,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
                   <XAxis dataKey="date" stroke="#374151" fontSize={11} fontWeight={500} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} />
                   <YAxis stroke="#374151" fontSize={11} fontWeight={500} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} tickFormatter={(v) => v.toLocaleString()} />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value: number) => [value.toLocaleString(), 'Events']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value) => [Number(value).toLocaleString(), 'Events']} />
                   <Area type="monotone" dataKey="total_events" stroke="#059669" fill="#059669" fillOpacity={0.15} strokeWidth={2} name="Events" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -462,7 +462,7 @@ export default function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value: number) => [value.toLocaleString(), 'Events']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value) => [Number(value).toLocaleString(), 'Events']} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -475,7 +475,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
                   <XAxis type="number" stroke="#374151" fontSize={11} fontWeight={500} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} />
                   <YAxis dataKey="type" type="category" stroke="#374151" fontSize={11} fontWeight={500} width={100} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value: number) => [value.toLocaleString(), 'Count']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value) => [Number(value).toLocaleString(), 'Count']} />
                   <Bar dataKey="count" fill="#D97706" radius={[0, 6, 6, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -507,7 +507,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
                   <XAxis type="number" stroke="#374151" fontSize={11} fontWeight={500} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} />
                   <YAxis dataKey="event_name" type="category" stroke="#374151" fontSize={10} fontWeight={500} width={110} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} tickFormatter={(v) => v.replace(/_/g, ' ').slice(0, 16)} />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value: number) => [value.toLocaleString(), 'Events']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value) => [Number(value).toLocaleString(), 'Events']} />
                   <Bar dataKey="count" fill="#7C3AED" radius={[0, 6, 6, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -521,7 +521,7 @@ export default function Dashboard() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E5EA" />
                   <XAxis dataKey="name" stroke="#374151" fontSize={10} fontWeight={500} angle={-35} textAnchor="end" height={50} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} />
                   <YAxis stroke="#374151" fontSize={11} fontWeight={500} tickLine={false} axisLine={{ stroke: '#D1D5DB' }} tickFormatter={(v) => (v / 1000).toFixed(0) + 'k'} />
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value: number) => [value.toLocaleString(), 'Products']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value) => [Number(value).toLocaleString(), 'Products']} />
                   <Bar dataKey="products" fill="#2563EB" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -537,7 +537,7 @@ export default function Dashboard() {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value: number) => [value.toLocaleString(), 'Sessions']} />
+                  <Tooltip contentStyle={{ backgroundColor: '#fff', border: '1px solid #E5E5EA', borderRadius: 12, fontWeight: 500 }} formatter={(value) => [Number(value).toLocaleString(), 'Sessions']} />
                   <Legend wrapperStyle={{ fontSize: 12, fontWeight: 500 }} />
                 </PieChart>
               </ResponsiveContainer>
