@@ -124,21 +124,27 @@ export default function Dashboard() {
       const dateFilter = getDateFilter(timeRange);
       const today = format(new Date(), 'yyyy-MM-dd');
 
-      const { data: events } = await supabase
+      const { data: events, error: eventsError } = await supabase
         .from('analytics_events')
         .select('received_at, firebase_uid, event_name, platform, props')
         .gte('received_at', dateFilter)
         .order('received_at', { ascending: false });
 
-      const { data: sessions } = await supabase
+      console.log('Events fetch:', { count: events?.length, error: eventsError });
+
+      const { data: sessions, error: sessionsError } = await supabase
         .from('chat_sessions')
         .select('created_at, user_id, state')
         .gte('created_at', dateFilter);
 
-      const { data: messages } = await supabase
+      console.log('Sessions fetch:', { count: sessions?.length, error: sessionsError });
+
+      const { data: messages, error: messagesError } = await supabase
         .from('chat_messages')
         .select('created_at, role, response_type, processing_ms, scenario')
         .gte('created_at', dateFilter);
+
+      console.log('Messages fetch:', { count: messages?.length, error: messagesError });
 
       // Fetch live store data instead of stale daily_observability snapshot
       const { data: stores } = await supabase
