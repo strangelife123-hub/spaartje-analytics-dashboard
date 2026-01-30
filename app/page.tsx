@@ -453,7 +453,7 @@ export default function Dashboard() {
                     cx="50%"
                     cy="50%"
                     outerRadius={70}
-                    label={({ platform, percent }) => `${platform}: ${((percent || 0) * 100).toFixed(0)}%`}
+                    label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
                     labelLine={{ stroke: '#6B7280', strokeWidth: 1 }}
                     fontSize={12}
                     fontWeight={600}
