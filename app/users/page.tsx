@@ -733,6 +733,7 @@ export default function UsersPage() {
                 target={20}
                 unit="%"
                 good={stats.dauWauRatio >= 20}
+                description="How often users return. Higher = more habit-forming."
               />
               <PMFIndicator
                 label="W1 Retention"
@@ -740,6 +741,7 @@ export default function UsersPage() {
                 target={25}
                 unit="%"
                 good={stats.w1Retention >= 25}
+                description="Users who return in week 2 after first use."
               />
               <PMFIndicator
                 label="Action Rate"
@@ -747,6 +749,7 @@ export default function UsersPage() {
                 target={30}
                 unit="%"
                 good={stats.actionRate >= 30}
+                description="Users who take action (swap, save basket)."
               />
               <PMFIndicator
                 label="Aha! Rate"
@@ -754,6 +757,7 @@ export default function UsersPage() {
                 target={40}
                 unit="%"
                 good={activationMetrics.ahaEventRate >= 40}
+                description="Users who found €3+ savings (the aha moment)."
               />
             </div>
           </Card>
@@ -782,7 +786,7 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-function PMFIndicator({ label, value, target, unit, good }: { label: string; value: number; target: number; unit: string; good: boolean }) {
+function PMFIndicator({ label, value, target, unit, good, description }: { label: string; value: number; target: number; unit: string; good: boolean; description: string }) {
   return (
     <div className={`p-4 rounded-xl border-2 ${good ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
       <div className="flex items-center justify-between mb-2">
@@ -801,6 +805,7 @@ function PMFIndicator({ label, value, target, unit, good }: { label: string; val
         <span className={`text-2xl font-bold ${good ? 'text-emerald-700' : 'text-amber-700'}`}>{value}{unit}</span>
         <span className="text-xs text-gray-400">/ {target}{unit} target</span>
       </div>
+      <p className="text-[10px] text-gray-500 mt-2 leading-tight">{description}</p>
     </div>
   );
 }
