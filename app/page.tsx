@@ -99,6 +99,7 @@ export default function Dashboard() {
   const [todayStats, setTodayStats] = useState({ users: 0, events: 0, sessions: 0, messages: 0 });
   const [totalUsers, setTotalUsers] = useState(0);
   const [newUsers, setNewUsers] = useState(0);
+  const [returningUsers, setReturningUsers] = useState(0);
   const [avgProcessingMs, setAvgProcessingMs] = useState(0);
   const [totalSavings, setTotalSavings] = useState(0);
   const [basketsGenerated, setBasketsGenerated] = useState(0);
@@ -158,25 +159,28 @@ export default function Dashboard() {
         .from('store_offerings')
         .select('store_id');
 
-      // Get all users' first event dates to calculate new users
-      const { data: allEvents } = await supabase
+      // Count TRULY new users using is_new_user flag from auth_anonymous_selected events
+      // This excludes returning device users who just got a new Firebase UID
+      const { data: authEvents } = await supabase
         .from('analytics_events')
-        .select('firebase_uid, received_at')
-        .order('received_at', { ascending: true });
+        .select('firebase_uid, props')
+        .eq('event_name', 'auth_anonymous_selected')
+        .gte('received_at', dateFilter);
 
-      // Find first event date for each user
-      const userFirstEvent = new Map<string, string>();
-      allEvents?.forEach((e) => {
-        if (!userFirstEvent.has(e.firebase_uid)) {
-          userFirstEvent.set(e.firebase_uid, e.received_at);
+      // Count users where is_new_user = true (truly new devices)
+      const trulyNewUsers = new Set<string>();
+      const returningDeviceUsers = new Set<string>();
+
+      authEvents?.forEach((e) => {
+        if (e.props?.is_new_user === true) {
+          trulyNewUsers.add(e.firebase_uid);
+        } else if (e.props?.is_returning_device === true) {
+          returningDeviceUsers.add(e.firebase_uid);
         }
       });
 
-      // Count users whose first event is within the selected time range
-      const newUsersCount = Array.from(userFirstEvent.values()).filter(
-        (firstEvent) => firstEvent >= dateFilter
-      ).length;
-      setNewUsers(newUsersCount);
+      setNewUsers(trulyNewUsers.size);
+      setReturningUsers(returningDeviceUsers.size);
 
       const allUsers = new Set(events?.map((e) => e.firebase_uid) || []);
       setTotalUsers(allUsers.size);
@@ -418,10 +422,11 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Row 1 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-2 sm:mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2 sm:gap-4 mb-2 sm:mb-4">
           <StatCard label="Today's Users" value={todayStats.users} color="text-blue-700" />
           <StatCard label="Today's Events" value={todayStats.events} color="text-emerald-700" />
-          <StatCard label="New Users" value={newUsers} color="text-violet-700" />
+          <StatCard label="New Users" value={newUsers} color="text-violet-700" subtitle="truly new devices" />
+          <StatCard label="Returning" value={returningUsers} color="text-cyan-700" subtitle="same device, new UID" />
           <StatCard label="Onboarding" value={`${onboardingRate}%`} color="text-amber-700" />
         </div>
 
@@ -664,11 +669,12 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ label, value, color }: { label: string; value: string | number; color: string }) {
+function StatCard({ label, value, color, subtitle }: { label: string; value: string | number; color: string; subtitle?: string }) {
   return (
     <div className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-sm">
       <p className="text-gray-600 text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1">{label}</p>
       <p className={`text-xl sm:text-2xl md:text-3xl font-semibold ${color}`}>{value}</p>
+      {subtitle && <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5">{subtitle}</p>}
     </div>
   );
 }
