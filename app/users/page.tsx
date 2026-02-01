@@ -74,6 +74,11 @@ export default function UsersPage() {
     firstBasketRate: 0,
     ahaEventRate: 0,
   });
+  const [acquisitionMetrics, setAcquisitionMetrics] = useState({
+    trulyNewUsers: 0,
+    returningDeviceUsers: 0,
+    newUserConversionRate: 0, // % of new users who generate a basket
+  });
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [timeRange, setTimeRange] = useState<'24h' | '7d' | '30d' | '3m' | '6m' | '9m' | '1y'>('30d');
@@ -314,6 +319,33 @@ export default function UsersPage() {
         ahaEventRate,
       });
 
+      // === Acquisition Metrics (True New vs Returning) ===
+      const trulyNewUsers = new Set<string>();
+      const returningDeviceUsers = new Set<string>();
+
+      events.filter(e => e.event_name === 'auth_anonymous_selected').forEach(e => {
+        if (e.props?.is_new_user === true) {
+          trulyNewUsers.add(e.firebase_uid);
+        } else if (e.props?.is_returning_device === true) {
+          returningDeviceUsers.add(e.firebase_uid);
+        }
+      });
+
+      // New user conversion: % of truly new users who generate a basket
+      const newUsersWithBasket = events.filter(e =>
+        e.event_name === 'basket_results_displayed' &&
+        trulyNewUsers.has(e.firebase_uid)
+      );
+      const newUserConversionRate = trulyNewUsers.size > 0
+        ? Math.round((new Set(newUsersWithBasket.map(e => e.firebase_uid)).size / trulyNewUsers.size) * 100)
+        : 0;
+
+      setAcquisitionMetrics({
+        trulyNewUsers: trulyNewUsers.size,
+        returningDeviceUsers: returningDeviceUsers.size,
+        newUserConversionRate,
+      });
+
       // === Performance ===
       const processingTimes = messages?.filter(m => m.processing_ms).map(m => m.processing_ms) || [];
       const avgProcessingMs = processingTimes.length > 0
@@ -507,6 +539,14 @@ export default function UsersPage() {
           <StatCard label="Onboarding" value={`${activationMetrics.onboardingCompletionRate}%`} color="text-blue-700" subtitle="completion" />
           <StatCard label="First Basket" value={`${activationMetrics.firstBasketRate}%`} color="text-emerald-700" subtitle="of users" />
           <StatCard label="Aha! (€3+)" value={`${activationMetrics.ahaEventRate}%`} color="text-violet-700" subtitle="found savings" />
+        </div>
+
+        {/* Acquisition Metrics */}
+        <h2 className="text-lg font-semibold mb-3 text-gray-700">Acquisition (True New vs Returning)</h2>
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
+          <StatCard label="Truly New" value={acquisitionMetrics.trulyNewUsers} color="text-emerald-700" subtitle="new devices" />
+          <StatCard label="Returning Device" value={acquisitionMetrics.returningDeviceUsers} color="text-amber-700" subtitle="same device, new UID" />
+          <StatCard label="New→Basket" value={`${acquisitionMetrics.newUserConversionRate}%`} color="text-blue-700" subtitle="conversion rate" />
         </div>
 
         {/* Performance */}
